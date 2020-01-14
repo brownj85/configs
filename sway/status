@@ -1,0 +1,35 @@
+#!/bin/sh
+
+battery(){
+	
+	if [ $(cat "/sys/class/power_supply/AC/online") -eq 0 ];
+	then
+		echo "battery: $(cat /sys/class/power_supply/BAT0/capacity)"
+	else
+		echo "charging: $(cat /sys/class/power_supply/BAT0/capacity)"
+	fi
+}
+
+sound(){
+	INFO=$(amixer get Master | grep -o "\[.*\]")
+	MUT=$(echo $INFO | cut -d' ' -f3)
+	
+	if [ "$MUT" = '[off]' ];
+	then
+		echo "volume: $(echo $INFO | cut -c2-3)"
+	else
+		echo "muted: $(echo $INFO | cut -c2-3)"
+	fi
+}
+
+mydate(){
+	echo "$(date +'%Y-%m-%d %l:%M:%S %p')"
+}
+
+
+while true; do
+	echo "$(sound)    $(battery)    $(mydate)"
+	
+	sleep $1
+done
+
